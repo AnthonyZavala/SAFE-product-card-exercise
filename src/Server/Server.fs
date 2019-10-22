@@ -9,6 +9,7 @@ open Saturn
 open Shared
 open Newtonsoft.Json
 open Thoth.Json.Net
+open System
 
 
 let tryGetEnv = System.Environment.GetEnvironmentVariable >> function null | "" -> None | x -> Some x
@@ -22,8 +23,33 @@ let port =
 let products = JsonConvert.DeserializeObject<Product []>(
                 File.ReadAllText "products.json", Converters.OptionConverter())
 
+let getUser userId = 
+    printfn "%s" (userId.ToString())
+    json (userId.ToString())
+    
+let getUserFavorites userId = 
+    printfn "%s" (userId.ToString())
+    json (userId.ToString())
+
+let createUser userId = 
+    printfn "%s" (userId.ToString())
+    json (userId.ToString())
+
+let addUserFavorite (userId: Guid, productId: Guid) = 
+    printfn "%s | %s" (userId.ToString()) (productId.ToString())
+    json (productId.ToString())
+
+let removeUserFavorite (userId: Guid, productId: Guid) = 
+    printfn "%s | %s" (userId.ToString()) (productId.ToString())
+    json (productId.ToString())
+
 let webApp = router {
-    get "/api/products" (json products) 
+    get "/api/products" (json products)
+    getf "/api/users/%O" getUser
+    getf "/api/users/%O/favorites" getUserFavorites
+    postf "/api/users/%O" createUser
+    postf "/api/users/%O/addFavorite/%O" addUserFavorite
+    postf "/api/users/%O/removeFavorite/%O" removeUserFavorite
 }
 
 let extraCoders =
