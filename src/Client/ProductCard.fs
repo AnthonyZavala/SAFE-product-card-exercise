@@ -4,7 +4,17 @@ open Fable.React
 open Fable.React.Props
 open Fable.MaterialUI.Core
 open Fable.MaterialUI.Props
+open Fable.MaterialUI.Icons
+open Fable.Core.JsInterop
+open Fable.Core
 
+type ToggleButtonProps =
+    | Value of string
+    | Selected of bool
+    | OnChange of (unit -> unit)
+
+let inline toggleButton (props: ToggleButtonProps list) (elems: ReactElement list): ReactElement =
+    ofImport "ToggleButton" "@material-ui/lab" (keyValueList CaseRules.LowerFirst props) elems
 // module Mui = Fable.MaterialUI.Core
 // module MuiProps = Fable.MaterialUI.Props
 
@@ -20,6 +30,7 @@ let toImageUrl product =
         product.ImageFilename
 
 let Product { product = product; isFavorite = isFavorite; setFavoriteCallback = setFavoriteCallback } =
+    let state = Hooks.useState (isFavorite)
     div
         [ ClassName "Product-Card"
           Style
@@ -42,7 +53,16 @@ let Product { product = product; isFavorite = isFavorite; setFavoriteCallback = 
                       div []
                           [ str
                               (sprintf "$%A | %A %A" product.Price product.PackageUnitAmount
-                                   product.PackageUnitFormatted) ] ] ] ]
+                                   product.PackageUnitFormatted) ] ]
+                grid
+                    [ Item true
+                      Xs(GridSizeNum.``3`` |> GridSize.Case3) ]
+                    [ toggleButton
+                        [ Value "check"
+                          Selected state.current
+                          OnChange(fun _ ->
+                              state.update (fun s -> (not s))
+                              setFavoriteCallback (not state.current) product) ] [ favoriteIcon [] ] ] ] ]
 
 let inline product product isFavorite setFavoriteCallback =
     ofFunction Product
