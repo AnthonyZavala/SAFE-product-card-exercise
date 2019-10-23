@@ -11,6 +11,7 @@ open Thoth.Json
 
 open Shared
 open ProductCard
+open System
 
 // The model holds data that you want to keep track of while the application is running
 // in this case, we are keeping track of a counter
@@ -19,9 +20,16 @@ open ProductCard
 type Model =
     { Products: Product list }
 
+type FavoriteEvent =
+    { UserId: Guid
+      ProductId: Guid }
+
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
-type Msg = InitialProductsLoaded of Product list
+type Msg =
+    | InitialStateLoaded of Product list
+    | FavoriteAdded of FavoriteEvent
+    | FavoriteRemoved of FavoriteEvent
 
 let extraCoders = Extra.empty |> Extra.withDecimal
 
@@ -31,7 +39,7 @@ let initialProducts() =
 // defines the initial state and initial command (= side-effect) of the application
 let init(): Model * Cmd<Msg> =
     let initialModel = { Products = List.empty }
-    let loadProductsCmd = Cmd.OfPromise.perform initialProducts () InitialProductsLoaded
+    let loadProductsCmd = Cmd.OfPromise.perform initialProducts () InitialStateLoaded
     initialModel, loadProductsCmd
 
 // The update function computes the next state of the application based on the current state and the incoming events/messages
@@ -39,19 +47,19 @@ let init(): Model * Cmd<Msg> =
 // these commands in turn, can dispatch messages to which the update function will react.
 let update (msg: Msg) (currentModel: Model): Model * Cmd<Msg> =
     match currentModel.Products, msg with
-    | _, InitialProductsLoaded initialProducts ->
+    | _, InitialStateLoaded initialProducts ->
         let nextModel = { Products = initialProducts }
         nextModel, Cmd.none
-// | _ -> currentModel, Cmd.none
-
-let toImageUrl product =
-    sprintf "//res.cloudinary.com/imperfect/image/upload/w_400,h_260,c_pad,b_auto,d_products:no-image-found.png/%s"
-        product.ImageFilename
+    // | _, FavoriteAdded favoriteAdded ->
+    //     Fetch.tryPost
+    //         ((sprintf "api/users/%O/addFavorite/%O" (favoriteAdded.UserId, favoriteAdded.ProductId)),
+    //          Encode.nil)
+    | _ -> currentModel, Cmd.none
 
 let show =
     function
     | { Products = products } when products |> List.isEmpty -> [ Heading.h3 [] [ str "Loading..." ] ]
-    | { Products = products } -> products |> List.map (fun x -> product x false (fun x y -> ()))
+    | { Products = products } -> products |> List.map (fun x -> product x false (fun x y -> printfn "%b | %A" x y))
 
 let view (model: Model) (dispatch: Msg -> unit) =
     div []
