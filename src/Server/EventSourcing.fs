@@ -6,4 +6,4 @@ type Aggregate<'TState,'TEvent,'TCommand> =
       /// Applies an event to a state, returning the new state
       Apply: 'TState -> 'TEvent -> 'TState
       /// Executes a command on a state yielding events
-      Execute: 'TCommand -> 'TState -> 'TEvent List }
+      Execute: 'TCommand -> 'TState -> 'TEvent }

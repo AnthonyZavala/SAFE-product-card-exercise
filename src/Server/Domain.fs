@@ -35,12 +35,12 @@ let private apply (state: User) event =
 // Pattern Matching
 let private execute command (state: User) =
     match command with
-    | Create userId when state.Id = Guid.Empty -> [ Created userId ]
+    | Create userId when state.Id = Guid.Empty -> Created userId
     | AddFavorite productId when state.Id <> Guid.Empty && not (state.Favorites |> List.contains productId) ->
-        [ FavoriteAdded productId ]
+        FavoriteAdded productId
     | RemoveFavorite productId when state.Id <> Guid.Empty && state.Favorites |> List.contains productId ->
-        [ FavoriteRemoved productId ]
-    | _ -> [ Errored(command, state) ]
+        FavoriteRemoved productId
+    | _ -> Errored(command, state)
 
 let Aggregate =
     { Initialize = User.Initialize

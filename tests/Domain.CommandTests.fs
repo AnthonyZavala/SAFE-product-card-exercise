@@ -7,8 +7,7 @@ module CommandTests =
 
     let Given state: User = state
     let When command state = Aggregate.Execute command state
-    let Then (expectedEvent: UserEvent) (actualEvents: UserEvent List) =
-        Assert.Equal<List<UserEvent>>([ expectedEvent ], actualEvents)
+    let Then (expectedEvent: UserEvent) (actualEvents: UserEvent) = Assert.Equal<UserEvent>(expectedEvent, actualEvents)
 
     let rdm = Random()
 
