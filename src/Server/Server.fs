@@ -4,19 +4,19 @@ open Saturn
 open Shared
 open Newtonsoft.Json
 open Thoth.Json.Net
-open System
 open UserService
 
 let tryGetEnv = System.Environment.GetEnvironmentVariable >> function null | "" -> None | x -> Some x
 
 let publicPath = Path.GetFullPath "../Client/public"
+let productsPath = Path.GetFullPath "./products.json"
 
 let port =
     "SERVER_PORT"
     |> tryGetEnv |> Option.map uint16 |> Option.defaultValue 8085us
 
 let products = JsonConvert.DeserializeObject<Product []>(
-                File.ReadAllText "products.json", Converters.OptionConverter())
+                File.ReadAllText productsPath, Converters.OptionConverter())
 
 let webApp = router {
     get "/api/products" (json products)

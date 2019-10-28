@@ -2,6 +2,10 @@ namespace Shared
 
 open System
 
+type User =
+    { Id: Guid
+      Favorites: Guid list }
+
 type Product =
     { ProductId: Guid
       InventoryId: Guid
