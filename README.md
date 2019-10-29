@@ -32,10 +32,10 @@ Keep it small in scope so that you can complete it within 2 hours.
 ## Discussion
 I chose to implement user favorites. Giving customers a way to mark products so that they are saved.
 
-The implemented feature can be utilized by clicking on the heart icon in each individual product card. Shaded means the product has been selected as a favorite.
+The implemented feature can be utilized by clicking on the heart icon in each individual product card. Shaded means the product has been selected as a favorite.  
 ![Favorite Button](FavoriteButton.png)
 
-When the page is first loaded, your user is persisted in the browser's LocalStorage. Refreshing the page after some products have been selected will result in the favorites being displayed first.
+When the page is first loaded, your user is persisted in the browser's LocalStorage. Refreshing the page after some products have been selected will result in the favorites being displayed first.  
 ![Favorites First](FavoritesFirst.png)
 
 Implementing user favorites provided me we a path to showcase an in-memory event sourcing solution. Asynchronous logic is demonstrated using HTTP calls between the react client and the node server in order to get Product and User data, as well as post User commands. Additionally, if this were to be a production ready solution, I would also be emitting the user events on a message bus. Data manipulation is demonstrated by storing the user events individually and using a fold function to replay the events into the current state. The UI is also derived from multiple data sources by using the user's favorites to reorder the products on page load.
