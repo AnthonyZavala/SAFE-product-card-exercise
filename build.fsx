@@ -12,32 +12,37 @@ open Fake.Core
 open Fake.DotNet
 open Fake.IO
 
-Target.initEnvironment ()
+Target.initEnvironment()
 
 let serverPath = Path.getFullName "./src/Server"
 let clientPath = Path.getFullName "./src/Client"
 let clientDeployPath = Path.combine clientPath "deploy"
 let deployDir = Path.getFullName "./deploy"
+let testPath = Path.getFullName "./tests"
 
 let release = ReleaseNotes.load "RELEASE_NOTES.md"
 
 let platformTool tool winTool =
-    let tool = if Environment.isUnix then tool else winTool
+    let tool =
+        if Environment.isUnix then tool
+        else winTool
     match ProcessUtils.tryFindFileOnPath tool with
     | Some t -> t
     | _ ->
         let errorMsg =
-            tool + " was not found in path. " +
-            "Please install it and make sure it's available from your path. " +
-            "See https://safe-stack.github.io/docs/quickstart/#install-pre-requisites for more info"
+            tool + " was not found in path. " + "Please install it and make sure it's available from your path. "
+            + "See https://safe-stack.github.io/docs/quickstart/#install-pre-requisites for more info"
         failwith errorMsg
 
 let nodeTool = platformTool "node" "node.exe"
 let yarnTool = platformTool "yarn" "yarn.cmd"
 
 let runTool cmd args workingDir =
-    let arguments = args |> String.split ' ' |> Arguments.OfArgs
-    Command.RawCommand (cmd, arguments)
+    let arguments =
+        args
+        |> String.split ' '
+        |> Arguments.OfArgs
+    Command.RawCommand(cmd, arguments)
     |> CreateProcess.fromCommand
     |> CreateProcess.withWorkingDirectory workingDir
     |> CreateProcess.ensureExitCode
@@ -45,8 +50,7 @@ let runTool cmd args workingDir =
     |> ignore
 
 let runDotNet cmd workingDir =
-    let result =
-        DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
+    let result = DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
 let openBrowser url =
@@ -58,41 +62,30 @@ let openBrowser url =
     |> ignore
 
 
-Target.create "Clean" (fun _ ->
-    [ deployDir
-      clientDeployPath ]
-    |> Shell.cleanDirs
-)
+Target.create "Clean" (fun _ -> [ deployDir; clientDeployPath ] |> Shell.cleanDirs)
 
 Target.create "InstallClient" (fun _ ->
     printfn "Node version:"
     runTool nodeTool "--version" __SOURCE_DIRECTORY__
     printfn "Yarn version:"
     runTool yarnTool "--version" __SOURCE_DIRECTORY__
-    runTool yarnTool "install --frozen-lockfile" __SOURCE_DIRECTORY__
-)
+    runTool yarnTool "install --frozen-lockfile" __SOURCE_DIRECTORY__)
 
 Target.create "Build" (fun _ ->
     runDotNet "build" serverPath
-    Shell.regexReplaceInFileWithEncoding
-        "let app = \".+\""
-       ("let app = \"" + release.NugetVersion + "\"")
-        System.Text.Encoding.UTF8
-        (Path.combine clientPath "Version.fs")
-    runTool yarnTool "webpack-cli -p" __SOURCE_DIRECTORY__
-)
+    Shell.regexReplaceInFileWithEncoding "let app = \".+\"" ("let app = \"" + release.NugetVersion + "\"")
+        System.Text.Encoding.UTF8 (Path.combine clientPath "Version.fs")
+    runTool yarnTool "webpack-cli -p" __SOURCE_DIRECTORY__)
 
 Target.create "Run" (fun _ ->
-    let server = async {
-        runDotNet "watch run" serverPath
-    }
-    let client = async {
-        runTool yarnTool "webpack-dev-server" __SOURCE_DIRECTORY__
-    }
-    let browser = async {
-        do! Async.Sleep 5000
-        openBrowser "http://localhost:8080"
-    }
+    let server = async { runDotNet "watch run" serverPath }
+    let client = async { runTool yarnTool "webpack-dev-server" __SOURCE_DIRECTORY__ }
+
+    let browser =
+        async {
+            do! Async.Sleep 5000
+            openBrowser "http://localhost:8080"
+        }
 
     let vsCodeSession = Environment.hasEnvironVar "vsCodeSession"
     let safeClientOnly = Environment.hasEnvironVar "safeClientOnly"
@@ -105,23 +98,12 @@ Target.create "Run" (fun _ ->
     tasks
     |> Async.Parallel
     |> Async.RunSynchronously
-    |> ignore
-)
+    |> ignore)
 
-
-
-
-
+Target.create "Test" (fun _ -> runDotNet "test" testPath)
 
 open Fake.Core.TargetOperators
 
-"Clean"
-    ==> "InstallClient"
-    ==> "Build"
-
-
-"Clean"
-    ==> "InstallClient"
-    ==> "Run"
+"Clean" ==> "InstallClient" ==> "Build"
 
 Target.runOrDefaultWithArguments "Build"
