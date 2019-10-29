@@ -29,15 +29,9 @@ let toImageUrl product =
     sprintf "//res.cloudinary.com/imperfect/image/upload/w_400,h_260,c_pad,b_auto,d_products:no-image-found.png/%s"
         product.ImageFilename
 
-let Product { product = product; isFavorite = isFavorite; setFavoriteCallback = setFavoriteCallback } =
+let ProductCard { product = product; isFavorite = isFavorite; setFavoriteCallback = setFavoriteCallback } =
     let state = Hooks.useState (isFavorite)
-    div
-        [ ClassName "Product-Card"
-          Style
-              [ Border "1px solid gray"
-                CSSProp.BorderRadius "4px"
-                CSSProp.Margin "36px"
-                Width "20%" ] ]
+    div [ ClassName "Product-card" ]
         [ grid [ Container true ]
               [ grid
                   [ Item true
@@ -64,8 +58,8 @@ let Product { product = product; isFavorite = isFavorite; setFavoriteCallback = 
                               state.update (fun s -> (not s))
                               setFavoriteCallback (not state.current) product) ] [ favoriteIcon [] ] ] ] ]
 
-let inline product product isFavorite setFavoriteCallback =
-    ofFunction Product
+let inline productCard product isFavorite setFavoriteCallback =
+    ofFunction ProductCard
         { product = product
           isFavorite = isFavorite
           setFavoriteCallback = setFavoriteCallback } []

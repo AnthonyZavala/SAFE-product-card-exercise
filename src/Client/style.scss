@@ -2,15 +2,71 @@
 
 // FontAwesome
 $fa_font_path: "~@fortawesome/fontawesome-free/webfonts";
-@import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
-@import '~@fortawesome/fontawesome-free/scss/regular.scss';
-@import '~@fortawesome/fontawesome-free/scss/solid.scss';
-@import '~@fortawesome/fontawesome-free/scss/brands.scss';
+@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "~@fortawesome/fontawesome-free/scss/regular.scss";
+@import "~@fortawesome/fontawesome-free/scss/solid.scss";
+@import "~@fortawesome/fontawesome-free/scss/brands.scss";
 
 // OpenSans
 $FontPathOpenSans: "~open-sans-fonts/open-sans";
-@import '~open-sans-fonts/open-sans';
-$family-primary: 'Open Sans';
+@import "~open-sans-fonts/open-sans";
+$family-primary: "Open Sans";
 
 // Bulma
 @import "~bulma/bulma";
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-row {
+  display: flex;
+  flex: 1;
+  margin: 36px;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.Product-card {
+  border: 1px solid gray;
+  border-radius: 4px;
+  margin: 36px;
+  width: 20%;
+}
+
+.Product-card > * {
+  overflow: hidden;
+}
+
+.Products-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
