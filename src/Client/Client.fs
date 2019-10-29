@@ -117,7 +117,8 @@ let show =
                         | false -> FavoriteRemoved)))
 
 let view (model: Model) (dispatch: Msg -> unit) =
-    div [ ClassName "app" ] [ Container.container [ Container.Option.CustomClass "App-row" ] [ div [ ClassName "Products-grid" ] (show (model, dispatch)) ] ]
+    div [ ClassName "app" ]
+        [ div [ ClassName "App-row" ] [ div [ ClassName "Products-grid" ] (show (model, dispatch)) ] ]
 
 #if DEBUG
 open Elmish.Debug

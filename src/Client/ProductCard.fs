@@ -46,8 +46,10 @@ let ProductCard { product = product; isFavorite = isFavorite; setFavoriteCallbac
                     [ div [] [ str product.Name ]
                       div []
                           [ str
-                              (sprintf "$%A | %A %A" product.Price product.PackageUnitAmount
-                                   product.PackageUnitFormatted) ] ]
+                              (sprintf "$%A %s" product.Price
+                                   (match product.PackageUnitAmount, product.PackageUnitFormatted with
+                                    | Some amount, Some unit -> (sprintf "| %A %A" amount unit)
+                                    | _ -> "")) ] ]
                 grid
                     [ Item true
                       Xs(GridSizeNum.``3`` |> GridSize.Case3) ]
